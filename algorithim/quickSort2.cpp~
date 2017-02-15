@@ -1,0 +1,49 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include <unistd.h>
+
+void quick_sort(int* data, int length, int iNum, int jNum, int pivotNum)
+{
+	
+	
+	if(length <= 1)
+		return;
+	else
+	{
+		int i = iNum;
+		int j = jNum;
+		int pivot = data[pivotNum];
+	
+		//printf("pivot %d %d %d %d\n", pivot, i ,j, length);
+		for( j ; j < (jNum +length -1 ); j++)
+		{
+			if(data[j] < pivot)
+			{	
+				int temp = data[j];
+				data[j] = data[i];
+				data[i] = temp;
+				i = i+1;
+			}
+			//printf("%d ", j);
+		}
+		
+		data[pivotNum] = data[i -1];
+		data[i -1] = pivot;
+		//printf("\n=============================\n");
+		//printf("pivot %d %d %d %d\n", pivot, i ,j, length);
+		if(j>= i)
+			quick_sort(data, j -i , i+1, i+1, i);
+		
+		quick_sort(data, i -1- pivotNum, pivotNum+1, pivotNum+1, pivotNum);
+	}
+	return;
+}
+
+int main()
+{
+	int data[10] = {5,4,3,2,1,7,8,6,11,10}; 
+    int length = sizeof(data)/sizeof(int);
+	quick_sort(data, length,1, 1, 0);
+	for(int i = 0 ;i < length; i++)
+        printf("%d ", data[i]);
+}

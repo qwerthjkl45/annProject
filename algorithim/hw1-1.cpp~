@@ -1,0 +1,18 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+
+void spilt(int *num)
+{
+	num[5] = 2;
+	return;
+}
+
+int main()
+{
+	int num[8] = {1,3,5,4,2,6,7,8};
+	spilt(num);
+	for(int i = 0; i < 8; i++)
+		printf("%d ", num[i]);
+	return 0;
+}

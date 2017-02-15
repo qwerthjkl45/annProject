@@ -1,0 +1,58 @@
+#include <cstdlib>
+#include <iostream>
+#include <stdio.h>
+#define SIZE 5
+
+using namespace std;
+
+long long splitInv(long *arr, long l, long u)
+{
+     long *tarr = new long[u-l+2];
+     long i=l, j=(u-l)/2+l+1, k;
+     long long count=0;
+     for(k=1; (k<=u-l+1) && (i<=(u-l)/2+l) && (j<=u); k++)
+     {
+              if(arr[i]<arr[j]) tarr[k]=arr[i++];
+              else
+              {
+                  tarr[k]=arr[j++];
+                  count=count+((u-l)/2+l-i+1);
+              }
+     }
+     for(; k<=u-l+1 && i<=(u-l)/2+l; k++) tarr[k]=arr[i++];
+     for(; k<=u-l+1 && j<=u; k++) tarr[k]=arr[j++];
+     for(k=1, i=l ; k<=u-l+1 && i<=u; k++, i++) arr[i]=tarr[k];
+     delete tarr;
+	 for(int i =0; i < u; i++)
+	 	printf("%ld -", arr[i]);
+	 printf("\ncount %lld\n\n", count);
+     return count;
+}
+
+long long numInv(long *arr, long l, long u, int id)
+{
+     printf("id %d\n", id);
+     if(u<=l) return 0;
+	 for(int i =0; i < u; i++)
+	 	printf("%ld ", arr[i]);
+     printf("\n\n-------------------");
+     return numInv(arr, l, (u-l)/2+l, 1) + numInv(arr, (u-l)/2+l+1, u, 2) + splitInv(arr, l, u);
+}
+
+int main(int argc, char *argv[])
+{
+    long arr[SIZE] = {1,2,5,3,6};
+	//long* arr = new long[SIZE];
+    /*char a[10];
+    FILE *f=fopen("input1.txt","r");
+    for(long i=1; i<=SIZE; i++)
+    {
+            fgets(a,10,f);
+            arr[i]=atol(a);
+    }
+    fclose(f);*/
+    cout<<"Number of Inversions: "<<numInv(arr,1,SIZE, 0)<<endl;
+    //delete arr;
+    system("PAUSE");
+    return EXIT_SUCCESS;
+}

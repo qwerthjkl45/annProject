@@ -1,0 +1,169 @@
+#include <cstdlib>
+#include <iostream>
+#include <stdio.h>
+#include <ctime>
+#include <string.h>
+#include <unistd.h>
+using namespace std;
+#define SIZE 4
+#define ROOT 1
+
+struct edge {
+	int head;
+	long dist;
+	edge* next;
+	bool visit ;
+};
+
+struct Data {
+	long distance;
+	int index;
+	
+};
+struct Data datas[SIZE+1];
+struct Data *q;
+edge* g[SIZE+1];
+
+int prev_edge[SIZE+1];
+
+
+void swap(int child, int parent, Data* tree)
+{
+	Data temp = tree[child];
+	tree[child] = tree[parent];
+	tree[parent] = temp;
+}
+
+void heapify(Data* tree, int root_index, int leave_index) {
+
+	int parent = 0;
+	int key = 0;
+	for(int i = root_index; i <= leave_index; i++) {
+		key = tree[i].distance;
+		parent = tree[i/2].distance;
+		int j = i;
+		while(key < parent) {
+			swap(j, j/2, tree);
+			j = j/2;
+			key = tree[j].distance;
+			parent = tree[j/2].distance;
+		}
+		
+	}
+}
+
+
+int total_size = SIZE+1;
+void insert_array(Data* queue, int size) {
+		
+	q = (Data*)malloc(sizeof(Data)*(size));
+	memcpy(q, queue, size*(sizeof(Data)));
+	heapify(q, 1, size-1);
+}
+
+void insert_index(int num) {
+	q = (Data*)realloc(q, (sizeof(Data))*(total_size+1));
+	q[total_size].distance = num;
+	q[total_size].index = total_size;
+	
+	heapify(q, 1, total_size);
+	total_size += 1;
+}
+
+void extract_min(int root, int length)
+{
+	int minNode = -1;
+	int left_child_index = root*2;
+	int right_child_index = root*2 +1;
+
+	if((left_child_index < length) && q[left_child_index].distance< q[root].distance )
+		minNode = left_child_index;
+	else minNode =root;
+	if((right_child_index < length) && (q[right_child_index].distance < q[root].distance) && 
+		(q[right_child_index].distance < q[left_child_index].distance))
+		minNode = right_child_index;
+	
+	if(minNode != root) {
+		swap(minNode, root, q);
+		extract_min(minNode, length);	
+	}
+	
+	extract_min(left_child_index, length);	
+	extract_min(right_child_index, length);
+	
+}
+
+int main() {
+	//length[1]->index = 2;
+	for(int i =1; i<= SIZE; i++) {
+		g[i] = NULL;
+		//g[i]->visit = false;
+		datas[i].index = i;
+		datas[i].distance = 10000000;
+		prev_edge[i] = 0;		
+	}
+	datas[1].distance = 0;
+	
+
+		
+	char* a = new char[400];	
+	FILE* f = fopen("test.txt", "r");
+	while(fgets(a, 400, f)) {
+		int n1 = atoi(a);
+		while(a[0]!= '\t') a++;
+		a++;
+		while(true)	{
+			int n2 = atoi(a);
+			while(a[0]!= ',') a++;
+			a++;
+			int n3 = atoi(a);
+			edge* newedge = new edge;
+			newedge->head = n2;
+			newedge->dist =n3;
+			newedge->next = g[n1];	
+			g[n1] = newedge;
+			g[n1]->visit = false;
+			while(a[0]!='\t' && strlen(a)>=3) a++;
+            if(strlen(a)<3) break;
+            a++;	
+		}
+		a = new char[400];
+	}
+
+	
+	//cout<<g[1]->dist<<endl;
+
+        //q[ROOT].index = 1;
+	insert_array(datas, SIZE+1);
+	int actual_q_size = SIZE;
+	while(actual_q_size > 1) {
+		//usleep(2000000);
+		int node_index = q[ROOT].index;		
+		edge* temp = g[node_index];
+		while(temp!= NULL) {
+			q[temp->head].index = temp->head;
+			long alt_dist = temp->dist + q[ROOT].distance;
+		   printf("node: %d, neighbor node: %d, compare:(%lu, %lu)\n", node_index, temp->head, alt_dist, q[temp->head].distance);
+			if(alt_dist < q[temp->head].distance) {
+				q[temp->head].distance = alt_dist;
+			}	
+			temp = temp->next;		
+		}	
+		printf("\n\n");
+		int g_index = q[ROOT].index;
+		g[g_index]->dist =  q[ROOT].distance;
+		g[g_index]->visit = true;
+		q[ROOT]= q[actual_q_size];
+		heapify(q, 1, actual_q_size);
+		actual_q_size--;	
+		
+		printf("\n\n");
+		
+	}
+		
+	//cout<<g[37]->dist<<endl;
+
+	
+	
+	
+}
